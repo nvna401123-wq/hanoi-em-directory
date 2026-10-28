@@ -89,7 +89,7 @@
        <i data-lucide="users-round" class="w-5 h-5"></i>
       </div><span data-template-id="brand-name" class="canva-text font-bold whitespace-pre-line" style="color: rgb(25, 59, 53); font-weight: 700; font-style: normal; font-size: 16px;">하노이 지역 임원
 Hanoi EM</span>
-     </div><span data-template-id="sample-badge" class="canva-tag rounded-full px-4 py-2" style="background: rgb(225, 243, 233); color: rgb(40, 107, 85); font-weight: 400; font-style: normal; font-size: 12px;">정보</span>
+     </div><button type="button" id="music-toggle" class="canva-tag rounded-full grid place-items-center focusable" aria-label="배경 음악 켜기" aria-pressed="false" title="배경 음악 켜기" style="width:44px;height:44px;border:0;cursor:pointer;background:rgb(225,243,233);color:rgb(40,107,85);"><i id="music-icon" data-lucide="volume-x" style="width:20px;height:20px;"></i></button>
     </div>
    </header>
    <main class="max-w-6xl mx-auto px-5 sm:px-8 pb-16">
@@ -126,10 +126,37 @@ Hanoi EM</span>
    </main>
    <footer class="max-w-6xl mx-auto px-5 sm:px-8 pb-8"></footer>
   </div>
+   <audio id="background-music" src="audio/background-music.mp3" loop preload="none"></audio>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
-      const overview = document.getElementById('overview');
+       const music = document.getElementById('background-music');
+       const musicToggle = document.getElementById('music-toggle');
+       const musicIcon = document.getElementById('music-icon');
+       const setMusicState = (isPlaying) => {
+         musicToggle.setAttribute('aria-pressed', String(isPlaying));
+         musicToggle.setAttribute('aria-label', isPlaying ? '배경 음악 끄기' : '배경 음악 켜기');
+         musicToggle.title = isPlaying ? '배경 음악 끄기' : '배경 음악 켜기';
+         musicIcon.setAttribute('data-lucide', isPlaying ? 'volume-2' : 'volume-x');
+         if (window.lucide) lucide.createIcons();
+       };
+       musicToggle.addEventListener('click', async () => {
+         if (music.paused) {
+           try {
+             await music.play();
+             setMusicState(true);
+           } catch (error) {
+             setMusicState(false);
+             musicToggle.title = '음악을 재생할 수 없습니다. 파일 경로를 확인하세요.';
+           }
+         } else {
+           music.pause();
+           setMusicState(false);
+         }
+       });
+       music.addEventListener('pause', () => setMusicState(false));
+       music.addEventListener('play', () => setMusicState(true));
+       const overview = document.getElementById('overview');
       const detail = document.getElementById('detail');
       const tabs = [...document.querySelectorAll('[data-group]')];
       const panels = [...document.querySelectorAll('.group-panel')];
